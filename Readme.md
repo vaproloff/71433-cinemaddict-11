@@ -1,7 +1,7 @@
 # Личный проект «Киноман» [![Build status][travis-image]][travis-url]
 
 * Студент: [Константин Пивнов](https://up.htmlacademy.ru/ecmascript/11/user/71433).
-* Наставник: `Неизвестно`.
+* Наставник: `Без наставника`.
 
 ---
 
