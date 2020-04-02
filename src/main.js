@@ -1,5 +1,3 @@
-'use strict';
-
 const FILMS_TO_RENDER = 5;
 const FILMS_EXTRA_TO_RENDER = 2;
 
