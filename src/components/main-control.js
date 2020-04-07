@@ -1,4 +1,4 @@
-export const createMainControlTemplate = () => {
+export const createMainControl = () => {
   return `
     <nav class="main-navigation">
       <div class="main-navigation__items">
