@@ -3,15 +3,14 @@ import {createMainControlTemplate} from "./components/main-control";
 import {createSortingControlTemplate} from "./components/sorting-control";
 import {createFilmsSectionTemplate} from "./components/films-section";
 import {createFilmsListContainerTemplate} from "./components/films-list-container";
-import {createFilmCardTemplate} from "./components/film-card";
+import {createFilmCard} from "./components/film-card";
 import {createShowmoreButtonTemplate} from "./components/showmore-button";
+import {renderElement} from "./utils";
+import {generateFilmBase} from "./mocks/film-cards";
 
+const FILMS_COUNT = 30;
 const FILMS_TO_RENDER = 5;
 const FILMS_EXTRA_TO_RENDER = 2;
-
-const renderElement = (container, template, place = `beforeend`) => {
-  container.insertAdjacentHTML(place, template);
-};
 
 // Рендер статуса пользователя
 const headerContainer = document.querySelector(`header.header`);
@@ -23,11 +22,16 @@ renderElement(mainContainer, createSortingControlTemplate()); // Рендер п
 renderElement(mainContainer, createFilmsSectionTemplate()); // Рендер секции с фильмами
 
 // Рендер всех фильмов
+const films = generateFilmBase(FILMS_COUNT);
+
+console.log(films);
+
 const filmsAllContainer = mainContainer.querySelector(`section.films-list`);
 renderElement(filmsAllContainer, createFilmsListContainerTemplate()); // Рендер контейнера для всех фильмов
-for (let i = 0; i < FILMS_TO_RENDER; i++) {
-  renderElement(filmsAllContainer.querySelector(`.films-list__container`), createFilmCardTemplate()); // Рендер карточек фильмов
-}
+
+films.slice(0, FILMS_TO_RENDER).forEach((it) => {
+  renderElement(filmsAllContainer.querySelector(`.films-list__container`), createFilmCard(it)); // Рендер карточек фильмов
+});
 
 renderElement(filmsAllContainer, createShowmoreButtonTemplate()); // Рендер кнопки Loadmore
 
@@ -36,6 +40,6 @@ const filmsExtraContainers = mainContainer.querySelectorAll(`section.films-list-
 filmsExtraContainers.forEach((it) => {
   renderElement(it, createFilmsListContainerTemplate());
   for (let i = 0; i < FILMS_EXTRA_TO_RENDER; i++) {
-    renderElement(it.querySelector(`.films-list__container`), createFilmCardTemplate()); // Рендер карточек фильмов
+    renderElement(it.querySelector(`.films-list__container`), createFilmCard(films[0])); // Рендер карточек фильмов
   }
 });
