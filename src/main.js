@@ -1,58 +1,85 @@
-import {createUserLevel} from "./components/user-level";
-import {createMainControl} from "./components/main-control";
-import {createSortingControl} from "./components/sorting-control";
-import {createFilmsSection} from "./components/films-section";
-import {createFilmCard} from "./components/film-card";
-import {createShowmoreButton} from "./components/showmore-button";
+import UserLevel from "./components/user-level";
+import MainControl from "./components/main-control";
+import SortingControl from "./components/sorting-control";
+import FilmsSection from "./components/films-section";
+import FilmsList from "./components/films-list";
+import FilmCard from "./components/film-card";
+import FilmPopup from "./components/film-popup";
+import ShowmoreButton from "./components/showmore-button";
+import FooterStatistic from "./components/footerStatistic";
 import {renderElement} from "./utils";
 import {generateFilmBase} from "./mocks/film-cards";
-// import {createFilmPopup} from "./components/film-popup";
 
 const FILMS_COUNT = Math.round(Math.random() * 5) + 15;
 const FILMS_TO_RENDER = 5;
 const FILMS_EXTRA_TO_RENDER = 2;
 
+const renderFilm = (container, film) => {
+  const filmCard = new FilmCard(film);
+  const onFilmPosterClick = (evt) => {
+    if (!(evt.target.className === `film-card__title`) &&
+      !(evt.target.className === `film-card__poster`) &&
+      !(evt.target.className === `film-card__comments`)) {
+      return;
+    }
+    const filmPopup = new FilmPopup(film);
+    const onPopupCloseClick = () => {
+      filmPopup.getElement().remove();
+      filmPopup.removeElement();
+    };
+
+    filmPopup.getElement().querySelector(`button.film-details__close-btn`).addEventListener(`click`, onPopupCloseClick);
+
+    renderElement(document.querySelector(`body`), filmPopup.getElement());
+  };
+
+  filmCard.getElement().addEventListener(`click`, onFilmPosterClick);
+
+  renderElement(container, filmCard.getElement()); // Рендер карточек фильмов
+};
+
 const renderFilmsPack = (container, filmsPack) => {
-  filmsPack.forEach((it) => {
-    renderElement(container, createFilmCard(it)); // Рендер карточек фильмов
+  filmsPack.forEach((film) => {
+    renderFilm(container, film);
   });
 };
 
 const films = generateFilmBase(FILMS_COUNT);
 let filmCardsRendered = Math.min(films.length, FILMS_TO_RENDER);
 
-const headerContainer = document.querySelector(`header.header`);
-renderElement(headerContainer, createUserLevel(films.filter((it) => it.isWatched).length)); // Рендер статуса пользователя
-renderElement(document.querySelector(`.footer__statistics`), `<p>${films.length}</p>`); // Рендер общего кол-ва фильмов
-
+renderElement(document.querySelector(`header.header`), new UserLevel(films.filter((it) => it.isWatched).length).getElement()); // Рендер статуса пользователя
+renderElement(document.querySelector(`.footer__statistics`), new FooterStatistic(films.length).getElement()); // Рендер общего кол-ва фильмов
 const mainContainer = document.querySelector(`main.main`);
-renderElement(mainContainer, createMainControl(films)); // Рендер главного меню
-renderElement(mainContainer, createSortingControl()); // Рендер панели сортировки
-renderElement(mainContainer, `<section class="films"></section>`); // Рендер секции с фильмами
-const filmsSection = mainContainer.querySelector(`section.films`);
+renderElement(mainContainer, new MainControl(films).getElement());
+renderElement(mainContainer, new SortingControl().getElement());
+const filmsSection = new FilmsSection().getElement();
+renderElement(mainContainer, filmsSection);
 
 // Рендер всех фильмов
-renderElement(filmsSection, createFilmsSection());
-const allFilmsListContainer = filmsSection.querySelector(`.films-list__container`);
+const allFilmsList = new FilmsList().getElement();
+renderElement(filmsSection, allFilmsList);
+const allFilmsListContainer = allFilmsList.lastElementChild;
 renderFilmsPack(allFilmsListContainer, films.slice(0, FILMS_TO_RENDER));
+
+const loadmoreButton = new ShowmoreButton().getElement();
 if (films.length > filmCardsRendered) {
-  renderElement(filmsSection.querySelector(`section.films-list`), createShowmoreButton()); // Рендер кнопки Loadmore
-  const loadMoreButton = filmsSection.querySelector(`.films-list__show-more`);
-  loadMoreButton.addEventListener(`click`, () => {
+  renderElement(allFilmsList, loadmoreButton); // Рендер кнопки Loadmore
+  loadmoreButton.addEventListener(`click`, () => {
     renderFilmsPack(allFilmsListContainer, films.slice(filmCardsRendered, filmCardsRendered + FILMS_TO_RENDER));
     filmCardsRendered = (filmCardsRendered + FILMS_TO_RENDER) > films.length ? films.length : (filmCardsRendered + FILMS_TO_RENDER);
     if (filmCardsRendered === films.length) {
-      loadMoreButton.classList.add(`visually-hidden`);
+      loadmoreButton.classList.add(`visually-hidden`);
     }
   });
 }
 
 // Рендер Extra фильмов
-renderElement(filmsSection, createFilmsSection(`Top rated`));
-renderElement(filmsSection, createFilmsSection(`Most commented`));
-const topRatedFilmsListContainer = filmsSection.querySelectorAll(`.films-list--extra .films-list__container`)[0];
+const topRatedFilmsList = new FilmsList(`Top rated`).getElement();
+renderElement(filmsSection, topRatedFilmsList);
+const topRatedFilmsListContainer = topRatedFilmsList.lastElementChild;
 renderFilmsPack(topRatedFilmsListContainer, films.slice(0).sort((a, b) => b.rating - a.rating).slice(0, FILMS_EXTRA_TO_RENDER));
-const mostCommentedFilmsListContainer = filmsSection.querySelectorAll(`.films-list--extra .films-list__container`)[1];
-renderFilmsPack(mostCommentedFilmsListContainer, films.slice(0).sort((a, b) => b.comments.length - a.comments.length).slice(0, FILMS_EXTRA_TO_RENDER));
 
-// renderElement(document.querySelector(`body`), createFilmPopup(films[0]));
+const mostCommentedFilmsList = new FilmsList(`Most commented`).getElement();
+renderElement(filmsSection, mostCommentedFilmsList);
+const mostCommentedFilmsListContainer = mostCommentedFilmsList.lastElementChild;
+renderFilmsPack(mostCommentedFilmsListContainer, films.slice(0).sort((a, b) => b.comments.length - a.comments.length).slice(0, FILMS_EXTRA_TO_RENDER));
