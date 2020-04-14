@@ -1,13 +1,15 @@
 import {createElement} from "../utils";
 
-export default class FilmsSection {
-  constructor() {
+export default class FooterStatistic {
+  constructor(filmsCount) {
+    this._filmsCount = filmsCount;
+
     this._element = null;
   }
 
   getTemplate() {
     return `
-    <section class="films"></section>
+    <p>${this._filmsCount}</p>
     `;
   }
 
