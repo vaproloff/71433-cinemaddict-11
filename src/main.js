@@ -16,21 +16,27 @@ const FILMS_EXTRA_TO_RENDER = 2;
 
 const renderFilm = (container, film) => {
   const filmCard = new FilmCard(film);
-  const onFilmPosterClick = (evt) => {
-    if (!(evt.target.className === `film-card__title`) &&
-      !(evt.target.className === `film-card__poster`) &&
-      !(evt.target.className === `film-card__comments`)) {
+  const onFilmPosterClick = (clickEvt) => {
+    if (!(clickEvt.target.className === `film-card__title`) &&
+      !(clickEvt.target.className === `film-card__poster`) &&
+      !(clickEvt.target.className === `film-card__comments`)) {
       return;
     }
     const filmPopup = new FilmPopup(film);
-    const onPopupCloseClick = () => {
+    const closePopup = () => {
       filmPopup.getElement().remove();
       filmPopup.removeElement();
     };
-
-    filmPopup.getElement().querySelector(`button.film-details__close-btn`).addEventListener(`click`, onPopupCloseClick);
+    const onEscKeydown = (keydownEvt) => {
+      if (keydownEvt.code === `Escape`) {
+        closePopup();
+      }
+    };
 
     renderElement(document.querySelector(`body`), filmPopup.getElement());
+
+    filmPopup.getElement().querySelector(`button.film-details__close-btn`).addEventListener(`click`, closePopup);
+    document.addEventListener(`keydown`, onEscKeydown);
   };
 
   filmCard.getElement().addEventListener(`click`, onFilmPosterClick);
@@ -55,31 +61,36 @@ renderElement(mainContainer, new SortingControl().getElement());
 const filmsSection = new FilmsSection().getElement();
 renderElement(mainContainer, filmsSection);
 
-// Рендер всех фильмов
-const allFilmsList = new FilmsList().getElement();
-renderElement(filmsSection, allFilmsList);
-const allFilmsListContainer = allFilmsList.lastElementChild;
-renderFilmsPack(allFilmsListContainer, films.slice(0, FILMS_TO_RENDER));
+if (filmCardsRendered === 0) {
+  renderElement(filmsSection, new FilmsList(`There are no movies in our database`).getElement());
+} else {
+  // Рендер всех фильмов
+  const allFilmsList = new FilmsList().getElement();
+  renderElement(filmsSection, allFilmsList);
+  const allFilmsListContainer = allFilmsList.lastElementChild;
+  renderFilmsPack(allFilmsListContainer, films.slice(0, FILMS_TO_RENDER));
 
-const loadmoreButton = new ShowmoreButton().getElement();
-if (films.length > filmCardsRendered) {
-  renderElement(allFilmsList, loadmoreButton); // Рендер кнопки Loadmore
-  loadmoreButton.addEventListener(`click`, () => {
-    renderFilmsPack(allFilmsListContainer, films.slice(filmCardsRendered, filmCardsRendered + FILMS_TO_RENDER));
-    filmCardsRendered = (filmCardsRendered + FILMS_TO_RENDER) > films.length ? films.length : (filmCardsRendered + FILMS_TO_RENDER);
-    if (filmCardsRendered === films.length) {
-      loadmoreButton.classList.add(`visually-hidden`);
-    }
-  });
+  // Рендер кнопки Loadmore
+  const loadmoreButton = new ShowmoreButton().getElement();
+  if (films.length > filmCardsRendered) {
+    renderElement(allFilmsList, loadmoreButton);
+    loadmoreButton.addEventListener(`click`, () => {
+      renderFilmsPack(allFilmsListContainer, films.slice(filmCardsRendered, filmCardsRendered + FILMS_TO_RENDER));
+      filmCardsRendered = (filmCardsRendered + FILMS_TO_RENDER) > films.length ? films.length : (filmCardsRendered + FILMS_TO_RENDER);
+      if (filmCardsRendered === films.length) {
+        loadmoreButton.classList.add(`visually-hidden`);
+      }
+    });
+  }
+
+  // Рендер Extra фильмов
+  const topRatedFilmsList = new FilmsList(`Top rated`).getElement();
+  renderElement(filmsSection, topRatedFilmsList);
+  const topRatedFilmsListContainer = topRatedFilmsList.lastElementChild;
+  renderFilmsPack(topRatedFilmsListContainer, films.slice(0).sort((a, b) => b.rating - a.rating).slice(0, FILMS_EXTRA_TO_RENDER));
+
+  const mostCommentedFilmsList = new FilmsList(`Most commented`).getElement();
+  renderElement(filmsSection, mostCommentedFilmsList);
+  const mostCommentedFilmsListContainer = mostCommentedFilmsList.lastElementChild;
+  renderFilmsPack(mostCommentedFilmsListContainer, films.slice(0).sort((a, b) => b.comments.length - a.comments.length).slice(0, FILMS_EXTRA_TO_RENDER));
 }
-
-// Рендер Extra фильмов
-const topRatedFilmsList = new FilmsList(`Top rated`).getElement();
-renderElement(filmsSection, topRatedFilmsList);
-const topRatedFilmsListContainer = topRatedFilmsList.lastElementChild;
-renderFilmsPack(topRatedFilmsListContainer, films.slice(0).sort((a, b) => b.rating - a.rating).slice(0, FILMS_EXTRA_TO_RENDER));
-
-const mostCommentedFilmsList = new FilmsList(`Most commented`).getElement();
-renderElement(filmsSection, mostCommentedFilmsList);
-const mostCommentedFilmsListContainer = mostCommentedFilmsList.lastElementChild;
-renderFilmsPack(mostCommentedFilmsListContainer, films.slice(0).sort((a, b) => b.comments.length - a.comments.length).slice(0, FILMS_EXTRA_TO_RENDER));
