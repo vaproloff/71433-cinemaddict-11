@@ -2,7 +2,7 @@ import FilmCard from "../components/film-card";
 import FilmPopup from "../components/film-popup";
 import {removeElement, renderElement} from "../utils/render";
 import MainControl from "../components/main-control";
-import SortingControl from "../components/sorting-control";
+import SortingControl, {SORT_TYPE} from "../components/sorting-control";
 import FilmsSection from "../components/films-section";
 import FilmsList from "../components/films-list";
 import ShowmoreButton from "../components/showmore-button";
@@ -14,6 +14,7 @@ export default class PageController {
   constructor(container, films) {
     this._container = container;
     this._films = films;
+    this._sortedFilms = this._films;
     this._mainControl = new MainControl(this._films);
     this._sortingControl = new SortingControl();
     this._filmsSection = new FilmsSection();
@@ -59,6 +60,20 @@ export default class PageController {
     renderElement(this._filmsSection.getElement(), this._allFilmsList);
   }
 
+  _sortFilms(sortType) {
+    switch (sortType) {
+      case SORT_TYPE.DEFAULT:
+        this._sortedFilms = this._films;
+        break;
+      case SORT_TYPE.DATE:
+        this._sortedFilms = this._films.slice().sort((a, b) => b.releaseDate - a.releaseDate);
+        break;
+      case SORT_TYPE.RATING:
+        this._sortedFilms = this._films.slice().sort((a, b) => b.rating - a.rating);
+        break;
+    }
+  }
+
   _renderFullBoard() {
     this._allFilmsList = new FilmsList();
     renderElement(this._filmsSection.getElement(), this._allFilmsList);
@@ -68,13 +83,19 @@ export default class PageController {
     if (this._films.length > this._filmCardsRendered) {
       renderElement(this._allFilmsList.getElement(), this._loadmoreButton);
       this._loadmoreButton.setClickHandler(() => {
-        this._renderFilmsPack(allFilmsListContainer, this._films.slice(this._filmCardsRendered, this._filmCardsRendered + FILMS_TO_RENDER));
-        this._filmCardsRendered = (this._filmCardsRendered + FILMS_TO_RENDER) > this._films.length ? this._films.length : (this._filmCardsRendered + FILMS_TO_RENDER);
-        if (this._filmCardsRendered === this._films.length) {
+        this._renderFilmsPack(allFilmsListContainer, this._sortedFilms.slice(this._filmCardsRendered, this._filmCardsRendered + FILMS_TO_RENDER));
+        this._filmCardsRendered = (this._filmCardsRendered + FILMS_TO_RENDER) > this._sortedFilms.length ? this._sortedFilms.length : (this._filmCardsRendered + FILMS_TO_RENDER);
+        if (this._filmCardsRendered === this._sortedFilms.length) {
           this._loadmoreButton.hide();
         }
       });
     }
+
+    this._sortingControl.setSortTypeChooseHandler((sortTypeChosen) => {
+      allFilmsListContainer.innerHTML = ``;
+      this._sortFilms(sortTypeChosen);
+      this._renderFilmsPack(allFilmsListContainer, this._sortedFilms.slice(0, this._filmCardsRendered));
+    });
 
     this._topRatedFilmsList = new FilmsList(`Top rated`);
     renderElement(this._filmsSection.getElement(), this._topRatedFilmsList);
