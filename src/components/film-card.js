@@ -1,6 +1,6 @@
 import AbstractComponent from "./abstract-component";
 
-export default class FilmCard extends AbstractComponent{
+export default class FilmCard extends AbstractComponent {
   constructor(film) {
     super();
 

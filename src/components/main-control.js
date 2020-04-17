@@ -1,6 +1,6 @@
 import AbstractComponent from "./abstract-component";
 
-export default class MainControl extends AbstractComponent{
+export default class MainControl extends AbstractComponent {
   constructor(films) {
     super();
 

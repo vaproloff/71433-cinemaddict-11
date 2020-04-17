@@ -1,6 +1,6 @@
 import AbstractComponent from "./abstract-component";
 
-export default class UserLevel extends AbstractComponent{
+export default class UserLevel extends AbstractComponent {
   constructor(filmsCount) {
     super();
     this._filmsCount = filmsCount;

@@ -1,7 +1,7 @@
 import {COMMENT_EMOTIONS} from "../mocks/consts";
 import AbstractComponent from "./abstract-component";
 
-export default class FilmPopup extends AbstractComponent{
+export default class FilmPopup extends AbstractComponent {
   constructor(film) {
     super();
 

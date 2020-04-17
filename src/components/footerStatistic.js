@@ -1,6 +1,6 @@
 import AbstractComponent from "./abstract-component";
 
-export default class FooterStatistic extends AbstractComponent{
+export default class FooterStatistic extends AbstractComponent {
   constructor(filmsCount) {
     super();
 

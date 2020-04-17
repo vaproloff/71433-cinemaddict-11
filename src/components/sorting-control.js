@@ -1,6 +1,6 @@
 import AbstractComponent from "./abstract-component";
 
-export default class SortingControl extends AbstractComponent{
+export default class SortingControl extends AbstractComponent {
   getTemplate() {
     return `
     <ul class="sort">
