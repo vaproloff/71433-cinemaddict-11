@@ -1,27 +1,15 @@
-import {createElement} from "../utils";
+import AbstractComponent from "./abstract-component";
 
-export default class FooterStatistic {
+export default class FooterStatistic extends AbstractComponent{
   constructor(filmsCount) {
-    this._filmsCount = filmsCount;
+    super();
 
-    this._element = null;
+    this._filmsCount = filmsCount;
   }
 
   getTemplate() {
     return `
     <p>${this._filmsCount}</p>
     `;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
