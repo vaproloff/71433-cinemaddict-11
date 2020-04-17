@@ -1,11 +1,11 @@
 import {COMMENT_EMOTIONS} from "../mocks/consts";
-import {createElement} from "../utils";
+import AbstractComponent from "./abstract-component";
 
-export default class FilmPopup {
+export default class FilmPopup extends AbstractComponent {
   constructor(film) {
-    this._film = film;
+    super();
 
-    this._element = null;
+    this._film = film;
   }
 
   getTemplate() {
@@ -136,15 +136,7 @@ export default class FilmPopup {
     `;
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setCloseClickHandler(handler) {
+    this.getElement().querySelector(`button.film-details__close-btn`).addEventListener(`click`, handler);
   }
 }

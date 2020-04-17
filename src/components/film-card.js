@@ -1,10 +1,10 @@
-import {createElement} from "../utils";
+import AbstractComponent from "./abstract-component";
 
-export default class FilmCard {
+export default class FilmCard extends AbstractComponent {
   constructor(film) {
-    this._film = film;
+    super();
 
-    this._element = null;
+    this._film = film;
   }
 
   getTemplate() {
@@ -32,15 +32,14 @@ export default class FilmCard {
     `;
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setClickHandler(handler) {
+    this.getElement().addEventListener(`click`, (evt) => {
+      if (!(evt.target.className === `film-card__title`) &&
+        !(evt.target.className === `film-card__poster`) &&
+        !(evt.target.className === `film-card__comments`)) {
+        return;
+      }
+      handler();
+    });
   }
 }

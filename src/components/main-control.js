@@ -1,9 +1,10 @@
-import {createElement} from "../utils";
+import AbstractComponent from "./abstract-component";
 
-export default class MainControl {
+export default class MainControl extends AbstractComponent {
   constructor(films) {
+    super();
+
     this._films = films;
-    this._element = null;
   }
 
   getTemplate() {
@@ -22,17 +23,5 @@ export default class MainControl {
       <a href="#stats" class="main-navigation__additional">Stats</a>
     </nav>
     `;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

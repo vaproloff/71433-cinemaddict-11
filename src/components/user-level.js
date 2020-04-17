@@ -1,11 +1,11 @@
-import {createElement} from "../utils";
+import AbstractComponent from "./abstract-component";
 
-export default class UserLevel {
+export default class UserLevel extends AbstractComponent {
   constructor(filmsCount) {
+    super();
     this._filmsCount = filmsCount;
     this._userLevel = ``;
 
-    this._element = null;
     this.updateUserLevel();
   }
 
@@ -16,18 +16,6 @@ export default class UserLevel {
       <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
     </section>
     `;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   updateUserLevel() {
