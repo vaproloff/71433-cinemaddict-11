@@ -1,7 +1,13 @@
 import {COMMENT_EMOTIONS} from "../mocks/consts";
-import FilmCard from "./film-card";
+import AbstractComponent from "./abstract-component";
 
-export default class FilmPopup extends FilmCard{
+export default class FilmPopup extends AbstractComponent{
+  constructor(film) {
+    super();
+
+    this._film = film;
+  }
+
   getTemplate() {
     const releaseDate = new Date(this._film.releaseDate).toLocaleDateString(`en-GB`, {day: `numeric`, month: `long`, year: `numeric`});
     const filmGenres = this._film.genres.map((it) => `<span class="film-details__genre">${it}</span>`).join(` `);
@@ -128,5 +134,9 @@ export default class FilmPopup extends FilmCard{
       </form>
     </section>
     `;
+  }
+
+  setCloseClickHandler(handler) {
+    this.getElement().querySelector(`button.film-details__close-btn`).addEventListener(`click`, handler);
   }
 }
