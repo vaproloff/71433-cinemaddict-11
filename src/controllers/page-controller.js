@@ -1,6 +1,4 @@
-import FilmCard from "../components/film-card";
-import FilmPopup from "../components/film-popup";
-import {removeElement, renderElement} from "../utils/render";
+import {renderElement} from "../utils/render";
 import MainControl from "../components/main-control";
 import SortingControl, {SORT_TYPE} from "../components/sorting-control";
 import FilmsSection from "../components/films-section";
@@ -24,38 +22,16 @@ export default class PageController {
     this._mostCommentedFilmsList = null;
     this._loadmoreButton = new ShowmoreButton();
 
+    this._onDataChange = this._onDataChange.bind(this);
     this._filmRenderedCount = null;
     this._filmsRendered = [];
   }
 
-  _renderFilm(container, film) {
-    const filmCard = new FilmCard(film);
-
-    filmCard.setClickHandler(() => {
-      const filmPopup = new FilmPopup(film);
-      const closePopup = () => {
-        removeElement(filmPopup);
-        document.removeEventListener(`keydown`, onEscKeydown);
-      };
-      const onEscKeydown = (keydownEvt) => {
-        if (keydownEvt.code === `Escape`) {
-          closePopup();
-        }
-      };
-
-      renderElement(document.querySelector(`body`), filmPopup);
-      filmPopup.setCloseClickHandler(closePopup);
-      document.addEventListener(`keydown`, onEscKeydown);
-    });
-
-    renderElement(container, filmCard); // Рендер карточек фильмов
-  }
-
   _renderFilmsPack(container, filmsPack) {
     filmsPack.forEach((film) => {
-      const filmController = new MovieController(container);
+      const filmController = new MovieController(container, film, this._onDataChange);
       this._filmsRendered.push(filmController);
-      filmController.render(film);
+      filmController.render();
     });
   }
 
@@ -89,6 +65,15 @@ export default class PageController {
         }
       });
     }
+  }
+
+  _onDataChange(filmComponent, newData) {
+    const index = this._films.findIndex((it) => it === filmComponent.filmData);
+    if (index === -1) {
+      return;
+    }
+    this._films[index] = newData;
+    filmComponent.rerenderCard(newData);
   }
 
   _renderFullBoard() {
