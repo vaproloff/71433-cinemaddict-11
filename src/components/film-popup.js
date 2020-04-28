@@ -1,6 +1,7 @@
 import {COMMENT_EMOTIONS} from "../mocks/consts";
 import AbstractSmartComponent from "./abstract-smart-component";
 import moment from "moment";
+import {encode} from "he";
 
 export default class FilmPopup extends AbstractSmartComponent {
   constructor(film, onDataChange) {
@@ -34,7 +35,7 @@ export default class FilmPopup extends AbstractSmartComponent {
                 </li>
               `).join(``);
     const emotionsList = COMMENT_EMOTIONS.map((it) => `
-                  <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${it}" value="${it}" ${this._choosenEmoji === it ? `checked` : ``}>
+                  <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${it}" value="${it}">
                   <label class="film-details__emoji-label" for="emoji-${it}">
                     <img src="./images/emoji/${it}.png" width="30" height="30" alt="emoji">
                   </label>
@@ -209,13 +210,14 @@ export default class FilmPopup extends AbstractSmartComponent {
   _onCommentSubmit() {
     if (this._choosenEmoji && this.getElement().querySelector(`.film-details__comment-input`).value) {
       const newComment = {
-        message: this.getElement().querySelector(`.film-details__comment-input`).value,
+        message: encode(this.getElement().querySelector(`.film-details__comment-input`).value),
         emotion: this._choosenEmoji,
         author: `User`,
         postDate: Date.now()
       };
       this._film = Object.assign({}, this._film, {comments: [...this._film.comments, newComment]});
       this._onDataChange(Object.assign({}, this._film));
+      this._choosenEmoji = null;
       this.rerender();
     }
   }

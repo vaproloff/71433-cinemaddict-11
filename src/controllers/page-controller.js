@@ -135,6 +135,7 @@ export default class PageController {
 
   _onFilterChange() {
     this._sortingControl.reset();
+    this._currentSortType = SORT_TYPE.DEFAULT;
     this._updateFilms(FILMS_TO_RENDER);
   }
 
