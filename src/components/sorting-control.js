@@ -45,4 +45,10 @@ export default class SortingControl extends AbstractComponent {
       handler(this._currentSortType);
     });
   }
+
+  reset() {
+    this._currentSortType = SORT_TYPE.DEFAULT;
+    this._element.querySelector(`.sort__button--active`).classList.remove(`sort__button--active`);
+    this._element.querySelector(`:first-child a`).classList.add(`sort__button--active`);
+  }
 }
