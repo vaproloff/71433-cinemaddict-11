@@ -5,6 +5,7 @@ import FilmsList from "../components/films-list";
 import ShowmoreButton from "../components/showmore-button";
 import MovieController from "./movie-controller";
 import FilterController from "./filter-controller";
+import UserLevel from "../components/user-level";
 
 const FILMS_TO_RENDER = 5;
 const FILMS_EXTRA_TO_RENDER = 2;
@@ -13,6 +14,7 @@ export default class PageController {
   constructor(container, filmsModel) {
     this._container = container;
     this._filmsModel = filmsModel;
+    this._userLevel = new UserLevel();
     this._filterController = new FilterController(this._container, this._filmsModel);
     this._sortingControl = new SortingControl();
     this._filmsSection = new FilmsSection();
@@ -32,11 +34,11 @@ export default class PageController {
     this._currentSortType = SORT_TYPE.DEFAULT;
 
     this._filmsModel.setFilterChangeHandler(this._onFilterChange);
-    this._filmsModel.setDataChangeHandler(this._updateFilms.bind(this));
   }
 
   render() {
     this._filterController.render();
+    renderElement(document.querySelector(`header.header`), this._userLevel);
     renderElement(this._container, this._sortingControl);
     renderElement(this._container, this._filmsSection);
 
@@ -69,6 +71,7 @@ export default class PageController {
     this._renderFilmsPack(this._topRatedFilmsListContainer, films.slice(0).sort((a, b) => b.rating - a.rating).slice(0, FILMS_EXTRA_TO_RENDER));
     this._renderFilmsPack(this._mostCommentedFilmsListContainer, films.slice(0).sort((a, b) => b.comments.length - a.comments.length).slice(0, FILMS_EXTRA_TO_RENDER));
     this._filmRenderedCount = count;
+    this._userLevel.updateUserLevel(this._filmsModel.getMovies().filter((it) => it.isWatched).length);
     this._renderLoadmoreButton();
   }
 
@@ -122,7 +125,7 @@ export default class PageController {
   _onDataChange(filmComponent, newData) {
     const isUpdateSucceed = this._filmsModel.updateMovie(newData.id, newData);
     if (isUpdateSucceed) {
-      filmComponent.rerenderCard(newData);
+      this._updateFilms();
     }
   }
 

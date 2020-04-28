@@ -23,10 +23,6 @@ export default class SortingControl extends AbstractComponent {
     `;
   }
 
-  getSortType() {
-    return this._currentSortType;
-  }
-
   setSortTypeChooseHandler(handler) {
     this._element.addEventListener(`click`, (evt) => {
       evt.preventDefault();
