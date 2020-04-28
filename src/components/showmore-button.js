@@ -10,8 +10,4 @@ export default class ShowmoreButton extends AbstractComponent {
   setClickHandler(handler) {
     this.getElement().addEventListener(`click`, handler);
   }
-
-  hide() {
-    this.getElement().classList.add(`visually-hidden`);
-  }
 }

@@ -23,10 +23,6 @@ export default class SortingControl extends AbstractComponent {
     `;
   }
 
-  getSortType() {
-    return this._currentSortType;
-  }
-
   setSortTypeChooseHandler(handler) {
     this._element.addEventListener(`click`, (evt) => {
       evt.preventDefault();
@@ -44,5 +40,11 @@ export default class SortingControl extends AbstractComponent {
       evt.target.classList.add(`sort__button--active`);
       handler(this._currentSortType);
     });
+  }
+
+  reset() {
+    this._currentSortType = SORT_TYPE.DEFAULT;
+    this._element.querySelector(`.sort__button--active`).classList.remove(`sort__button--active`);
+    this._element.querySelector(`:first-child a`).classList.add(`sort__button--active`);
   }
 }
