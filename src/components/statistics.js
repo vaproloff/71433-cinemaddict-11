@@ -3,8 +3,17 @@ import moment from "moment";
 import {GENRES, USER_RANKS} from "../mocks/consts";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import {capitalizeFirstLetter} from "../utils/utils";
 
 const BAR_HEIGHT = 50;
+const DEFAULT_FILTER = `all-time`;
+const FILTERS = {
+  'all-time': `all`,
+  'today': `days`,
+  'week': `weeks`,
+  'month': `months`,
+  'year': `years`
+};
 
 const countFilmsByGenre = (films) => {
   if (!films.length) {
@@ -24,6 +33,15 @@ const countFilmsByGenre = (films) => {
     .filter((it) => it.count > 0);
 };
 
+const getFilteredFilms = (films, filter) => {
+  if (filter === DEFAULT_FILTER) {
+    return films;
+  }
+  return films.filter((it) => {
+    return Math.abs(moment(it.isWatched).diff(moment(), FILTERS[filter])) < 1;
+  });
+};
+
 export default class Statistics extends AbstractSmartComponent {
   constructor(filmsModel) {
     super();
@@ -32,6 +50,7 @@ export default class Statistics extends AbstractSmartComponent {
     this._films = this._filmsModel.getMovies().filter((it) => it.isWatched);
 
     this._chart = null;
+    this._currentFilter = DEFAULT_FILTER;
     this._chartData = countFilmsByGenre(this._films);
   }
 
@@ -54,20 +73,10 @@ export default class Statistics extends AbstractSmartComponent {
         <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
           <p class="statistic__filters-description">Show stats:</p>
 
-          <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="all-time" checked>
-          <label for="statistic-all-time" class="statistic__filters-label">All time</label>
-
-          <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="today">
-          <label for="statistic-today" class="statistic__filters-label">Today</label>
-
-          <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="week">
-          <label for="statistic-week" class="statistic__filters-label">Week</label>
-
-          <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="month">
-          <label for="statistic-month" class="statistic__filters-label">Month</label>
-
-          <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="year">
-          <label for="statistic-year" class="statistic__filters-label">Year</label>
+          ${Object.keys(FILTERS).map((it) => `
+            <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-${it}" value="${it}"${it === this._currentFilter ? ` checked` : ``}>
+            <label for="statistic-${it}" class="statistic__filters-label">${it === DEFAULT_FILTER ? `All time` : capitalizeFirstLetter(it)}</label>
+          `).join(``)}
         </form>
 
         <ul class="statistic__text-list">
@@ -94,7 +103,7 @@ export default class Statistics extends AbstractSmartComponent {
   }
 
   rerender() {
-    this._films = this._filmsModel.getMovies().filter((it) => it.isWatched);
+    this._films = getFilteredFilms(this._filmsModel.getMovies().filter((it) => it.isWatched), this._currentFilter);
     this._chartData = countFilmsByGenre(this._films);
 
     super.rerender();
@@ -172,7 +181,12 @@ export default class Statistics extends AbstractSmartComponent {
     });
   }
 
-  recoveryListeners() {}
+  recoveryListeners() {
+    this.getElement().querySelector(`form.statistic__filters`).addEventListener(`change`, (evt) => {
+      this._currentFilter = evt.target.defaultValue;
+      this.rerender();
+    });
+  }
 
   show() {
     super.show();
