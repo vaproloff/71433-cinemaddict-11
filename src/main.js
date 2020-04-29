@@ -14,8 +14,7 @@ const moviesModel = new MoviesModel();
 moviesModel.setMovies(films);
 const pageController = new PageController(mainContainer, moviesModel);
 pageController.render();
-
-const statistics = new Statistics();
+const statistics = new Statistics(moviesModel);
 renderElement(mainContainer, statistics);
 statistics.hide();
 
@@ -23,9 +22,11 @@ mainContainer.addEventListener(`click`, (evt) => {
   switch (evt.target.classList[0]) {
     case `main-navigation__additional`:
       pageController.hide();
+      mainContainer.querySelector(`ul.sort`).classList.add(`visually-hidden`);
       statistics.show();
       break;
     case `main-navigation__item`:
+      mainContainer.querySelector(`ul.sort`).classList.remove(`visually-hidden`);
       pageController.show();
       statistics.hide();
       break;
