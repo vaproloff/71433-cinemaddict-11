@@ -1,6 +1,7 @@
 import FilmCard from "../components/film-card";
 import FilmPopup from "../components/film-popup";
 import {removeElement, renderElement} from "../utils/render";
+import moment from "moment";
 
 export default class MovieController {
   constructor(container, film, onDataChange, onViewChange) {
@@ -49,7 +50,7 @@ export default class MovieController {
 
     this._filmCard.setWatchedButtonClickHandler((evt) => {
       evt.preventDefault();
-      this._onDataChange(this, Object.assign({}, this._filmData, {isWatched: !this._filmData.isWatched}));
+      this._onDataChange(this, Object.assign({}, this._filmData, {isWatched: this._filmData.isWatched ? null : moment()}));
     });
 
     this._filmCard.setFavoriteButtonClickHandler((evt) => {
