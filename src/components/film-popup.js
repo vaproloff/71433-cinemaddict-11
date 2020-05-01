@@ -50,7 +50,7 @@ export default class FilmPopup extends AbstractSmartComponent {
           </div>
           <div class="film-details__info-wrap">
             <div class="film-details__poster">
-              <img class="film-details__poster-img" src="./images/posters/${this._film.posterImage}" alt="${this._film.name}">
+              <img class="film-details__poster-img" src="${this._film.posterImage}" alt="${this._film.name}">
 
               <p class="film-details__age">${this._film.ageRating}+</p>
             </div>
