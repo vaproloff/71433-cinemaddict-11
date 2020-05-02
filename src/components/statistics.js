@@ -19,7 +19,7 @@ const countFilmsByGenre = (films) => {
   if (!films.length) {
     return [];
   }
-  return GENRES.map((genre) => {
+  return [...GENRES].map((genre) => {
     return {
       genre,
       count: films.reduce((acc, film) => {
