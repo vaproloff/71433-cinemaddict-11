@@ -9,7 +9,7 @@ export default class FilmCard extends AbstractComponent {
   }
 
   getTemplate() {
-    const releaseYear = new Date(this._film.releaseDate).getFullYear();
+    const releaseYear = moment(this._film.releaseDate).year();
     const filmDuration = `${moment.duration(this._film.runtime, `minutes`).hours()}h ${moment.duration(this._film.runtime, `minutes`).minutes()}m`;
     const shortDescription = this._film.description.length > 140 ? `${this._film.description.slice(0, 139)}...` : this._film.description;
 
@@ -20,9 +20,9 @@ export default class FilmCard extends AbstractComponent {
       <p class="film-card__info">
         <span class="film-card__year">${releaseYear}</span>
         <span class="film-card__duration">${filmDuration}</span>
-        <span class="film-card__genre">${this._film.genres[0]}</span>
+        <span class="film-card__genre">${this._film.genres.length ? this._film.genres[0] : ``}</span>
       </p>
-      <img src="./images/posters/${this._film.posterImage}" alt="${this._film.name}" class="film-card__poster">
+      <img src="${this._film.posterImage}" alt="${this._film.name}" class="film-card__poster">
       <p class="film-card__description">${shortDescription}</p>
       <a class="film-card__comments">${this._film.comments.length} comment${this._film.comments.length > 1 ? `s` : ``}</a>
       <form class="film-card__controls">

@@ -11,9 +11,10 @@ const FILMS_TO_RENDER = 5;
 const FILMS_EXTRA_TO_RENDER = 2;
 
 export default class PageController {
-  constructor(container, filmsModel) {
+  constructor(container, filmsModel, api) {
     this._container = container;
     this._filmsModel = filmsModel;
+    this._api = api;
     this._userLevel = new UserLevel();
     this._filterController = new FilterController(this._container, this._filmsModel);
     this._sortingControl = new SortingControl();
@@ -122,10 +123,36 @@ export default class PageController {
     }
   }
 
-  _onDataChange(filmComponent, newData) {
-    const isUpdateSucceed = this._filmsModel.updateMovie(newData.id, newData);
-    if (isUpdateSucceed) {
-      this._updateFilms();
+  _onDataChange(filmData, updateComment) {
+    if (updateComment) {
+      if (updateComment.id) {
+        return this._api.deleteComment(updateComment.id)
+          .then(() => {
+            const isUpdateSucceed = this._filmsModel.updateMovie(filmData);
+            if (isUpdateSucceed) {
+              this._updateFilms();
+            }
+            return this._filmsModel.getFilmById(filmData.id);
+          });
+      } else {
+        return this._api.postComment(filmData.id, updateComment)
+          .then((filmModel) => {
+            const isUpdateSucceed = this._filmsModel.updateMovie(filmModel);
+            if (isUpdateSucceed) {
+              this._updateFilms();
+            }
+            return this._filmsModel.getFilmById(filmData.id);
+          });
+      }
+    } else {
+      return this._api.updateFilm(filmData)
+        .then((filmModel) => {
+          const isUpdateSucceed = this._filmsModel.updateMovie(filmModel);
+          if (isUpdateSucceed) {
+            this._updateFilms();
+          }
+          return this._filmsModel.getFilmById(filmData.id);
+        });
     }
   }
 

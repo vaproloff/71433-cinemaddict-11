@@ -1,4 +1,4 @@
-import {COMMENT_EMOTIONS} from "../mocks/consts";
+import {COMMENT_EMOTIONS} from "../utils/consts";
 import AbstractSmartComponent from "./abstract-smart-component";
 import moment from "moment";
 import {encode} from "he";
@@ -16,7 +16,7 @@ export default class FilmPopup extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    const releaseDate = new Date(this._film.releaseDate).toLocaleDateString(`en-GB`, {day: `numeric`, month: `long`, year: `numeric`});
+    const releaseDate = moment(this._film.releaseDate).format(`D MMMM YYYY`);
     const filmDuration = `${moment.duration(this._film.runtime, `minutes`).hours()}h ${moment.duration(this._film.runtime, `minutes`).minutes()}m`;
     const filmGenres = this._film.genres.map((it) => `<span class="film-details__genre">${it}</span>`).join(` `);
     const commentsList = this._film.comments.map((it) => `
@@ -50,7 +50,7 @@ export default class FilmPopup extends AbstractSmartComponent {
           </div>
           <div class="film-details__info-wrap">
             <div class="film-details__poster">
-              <img class="film-details__poster-img" src="./images/posters/${this._film.posterImage}" alt="${this._film.name}">
+              <img class="film-details__poster-img" src="${this._film.posterImage}" alt="${this._film.name}">
 
               <p class="film-details__age">${this._film.ageRating}+</p>
             </div>
@@ -93,7 +93,7 @@ export default class FilmPopup extends AbstractSmartComponent {
                   <td class="film-details__cell">${this._film.country}</td>
                 </tr>
                 <tr class="film-details__row">
-                  <td class="film-details__term">Genres</td>
+                  <td class="film-details__term">Genre${this._film.genres.length > 1 ? `s` : ``}</td>
                   <td class="film-details__cell">
                     ${filmGenres}
                    </td>
@@ -154,13 +154,22 @@ export default class FilmPopup extends AbstractSmartComponent {
 
   _subscribeOnEvents() {
     this.getElement().querySelector(`input#watchlist`).addEventListener(`change`, (evt) => {
-      this._onDataChange(Object.assign({}, this._film, {isAtWatchlist: evt.target.checked}));
+      this._onDataChange(Object.assign({}, this._film, {isAtWatchlist: evt.target.checked}))
+        .then((newFilmModel) => {
+          this._film = newFilmModel;
+        });
     });
     this.getElement().querySelector(`input#watched`).addEventListener(`change`, (evt) => {
-      this._onDataChange(Object.assign({}, this._film, {isWatched: evt.target.checked ? moment() : null}));
+      this._onDataChange(Object.assign({}, this._film, {isWatched: evt.target.checked ? moment() : null}))
+        .then((newFilmModel) => {
+          this._film = newFilmModel;
+        });
     });
     this.getElement().querySelector(`input#favorite`).addEventListener(`change`, (evt) => {
-      this._onDataChange(Object.assign({}, this._film, {isFavorite: evt.target.checked}));
+      this._onDataChange(Object.assign({}, this._film, {isFavorite: evt.target.checked}))
+        .then((newFilmModel) => {
+          this._film = newFilmModel;
+        });
     });
     this.getElement().querySelector(`.film-details__emoji-list`).addEventListener(`click`, (evt) => {
       if (evt.target.tagName === `INPUT`) {
@@ -198,10 +207,14 @@ export default class FilmPopup extends AbstractSmartComponent {
       it.addEventListener(`click`, (evt) => {
         if (evt.target.tagName === `BUTTON`) {
           evt.preventDefault();
+          const oldComment = this._film.comments[i];
           const newCommentList = [...this._film.comments.slice(0, i), ...this._film.comments.slice(i + 1)];
           this._film = Object.assign({}, this._film, {comments: newCommentList});
-          this._onDataChange(Object.assign({}, this._film));
-          this.rerender();
+          this._onDataChange(Object.assign({}, this._film), oldComment)
+            .then((newFilmModel) => {
+              this._film = newFilmModel;
+              this.rerender();
+            });
         }
       });
     });
@@ -212,13 +225,14 @@ export default class FilmPopup extends AbstractSmartComponent {
       const newComment = {
         message: encode(this.getElement().querySelector(`.film-details__comment-input`).value),
         emotion: this._choosenEmoji,
-        author: `User`,
-        postDate: moment()
+        postDate: moment().toISOString()
       };
-      this._film = Object.assign({}, this._film, {comments: [...this._film.comments, newComment]});
-      this._onDataChange(Object.assign({}, this._film));
       this._choosenEmoji = null;
-      this.rerender();
+      this._onDataChange(this._film, newComment)
+        .then((newFilmModel) => {
+          this._film = newFilmModel;
+          this.rerender();
+        });
     }
   }
 
