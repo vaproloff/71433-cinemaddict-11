@@ -49,7 +49,6 @@ export default class API {
   }
 
   postComment(filmId, newCommentData) {
-    console.log(`posting`)
     const headers = new Headers();
     headers.append(`Authorization`, this._authorization);
     headers.append(`Content-Type`, `application/json`);
@@ -58,11 +57,14 @@ export default class API {
       method: `POST`,
       body: JSON.stringify(Comment.toRaw(newCommentData)),
       headers,
-    }).then(checkStatus);
+    }).then(checkStatus)
+      .then((response) => response.json())
+      .then(({movie, comments}) => {
+        return Movie.parseFilm(movie, comments);
+      });
   }
 
   deleteComment(commentId) {
-    console.log(`deleting`)
     const headers = new Headers();
     headers.append(`Authorization`, this._authorization);
 

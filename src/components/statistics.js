@@ -1,6 +1,6 @@
 import AbstractSmartComponent from "./abstract-smart-component";
 import moment from "moment";
-import {GENRES, USER_RANKS} from "../mocks/consts";
+import {GENRES, USER_RANKS} from "../utils/consts";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {capitalizeFirstLetter} from "../utils/utils";

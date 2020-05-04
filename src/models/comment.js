@@ -16,12 +16,20 @@ export default class Comment {
   }
 
   static toRaw(comment) {
-    return {
-      'id': comment.id ? comment.id : null,
-      'author': comment.author,
-      'comment': comment.message,
-      'date': comment.postDate,
-      'emotion': comment.emotion
-    };
+    if (comment.id) {
+      return {
+        'id': comment.id,
+        'author': comment.author,
+        'comment': comment.message,
+        'date': comment.postDate,
+        'emotion': comment.emotion
+      };
+    } else {
+      return {
+        'comment': comment.message,
+        'date': comment.postDate,
+        'emotion': comment.emotion
+      };
+    }
   }
 }
