@@ -125,8 +125,8 @@ export default class PageController {
 
   _onDataChange(filmData, updateComment) {
     if (updateComment) {
-      if (updateComment.id) {
-        return this._api.deleteComment(updateComment.id)
+      if (updateComment.author) {
+        return this._api.deleteComment(updateComment.id, filmData)
           .then(() => {
             const isUpdateSucceed = this._filmsModel.updateMovie(filmData);
             if (isUpdateSucceed) {
@@ -135,7 +135,7 @@ export default class PageController {
             return this._filmsModel.getFilmById(filmData.id);
           });
       } else {
-        return this._api.postComment(filmData.id, updateComment)
+        return this._api.postComment(filmData.id, updateComment, filmData)
           .then((filmModel) => {
             const isUpdateSucceed = this._filmsModel.updateMovie(filmModel);
             if (isUpdateSucceed) {

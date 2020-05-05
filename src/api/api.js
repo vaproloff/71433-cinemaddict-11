@@ -1,5 +1,5 @@
-import Movie from "./models/movie";
-import Comment from "./models/comment";
+import Movie from "../models/movie";
+import Comment from "../models/comment";
 
 const checkStatus = (response) => {
   if (response.status >= 200 && response.status < 300) {
@@ -82,4 +82,17 @@ export default class API {
       .then(checkStatus)
       .then((response) => response.json());
   }
+
+  // sync(data) {
+  //   const headers = new Headers();
+  //   headers.append(`Authorization`, this._authorization);
+  //   headers.append(`Content-Type`, `application/json`);
+  //
+  //   return fetch(`https://11.ecmascript.pages.academy/cinemaddict//movies/sync`, {
+  //     method: `POST`,
+  //     body: JSON.stringify(data),
+  //     headers,
+  //   }).then(checkStatus)
+  //     .then((response) => response.json());
+  // }
 }
