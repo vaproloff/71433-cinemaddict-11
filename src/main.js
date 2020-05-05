@@ -39,3 +39,7 @@ api.getFilms()
 
     renderElement(document.querySelector(`.footer__statistics`), new FooterStatistic(films.length));
   });
+
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`);
+});
